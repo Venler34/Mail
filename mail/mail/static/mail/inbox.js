@@ -74,12 +74,14 @@ function view_email(emailID, mailbox) {
         const unarchive = document.createElement('button')
         unarchive.innerHTML = "Unarchive"
         unarchive.addEventListener('click', function() {
-          fetch(`/emails/${emailID}`, {
+          Promise.allSettled([
+            fetch(`/emails/${emailID}`, {
             method: 'PUT',
             body: JSON.stringify({
               archived: false
             })
-          }).then(load_mailbox('inbox'))
+          })
+          ]).then([load_mailbox('inbox')])
         })
         document.querySelector('#button').appendChild(unarchive)
       }
@@ -87,12 +89,13 @@ function view_email(emailID, mailbox) {
         const archive = document.createElement('button')
         archive.innerHTML = "Archive"
         archive.addEventListener('click', function() {
-          fetch(`/emails/${emailID}`, {
+          Promise.allSettled([
+            fetch(`/emails/${emailID}`, {
             method: 'PUT',
             body: JSON.stringify({
               archived: true
             })
-          }).then(load_mailbox('inbox'))
+          })]).then([load_mailbox('inbox')])
         })
         document.querySelector('#button').appendChild(archive)
       }
@@ -104,7 +107,7 @@ function view_email(emailID, mailbox) {
     reply.addEventListener('click', () => {
       document.querySelector('#compose-recipients').value = sender
 
-      if(subject.slice(0,3) === 'Re:'){
+      if(subject.slice(0,3) !== 'Re:') {
         document.querySelector('#compose-subject').value = `Re: ${subject}`
       } else {
         document.querySelector('#compose-subject').value = subject
